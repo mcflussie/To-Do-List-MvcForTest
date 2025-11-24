@@ -1,8 +1,37 @@
-﻿@{
+﻿@model Application.ViewModels.TasksListViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="row">
+    <div class="col-12 col-md-4"></div>
+    <div class="card">
+        <div class="card-header bg-primary text-light">
+            <h5 class="text-center">To Do List :)</h5>
+        </div>
+
+        @if (Model.Tasks.Count == 0)
+        {
+            <div class="card-body">
+                <div class="alert alert-info">No hay tareas creadas.</div>
+            </div>
+        }
+        else
+        {
+           
+                <table class="table table-bordered">
+                    <tbody>
+                        @foreach (var task in Model.Filtered)
+                        {
+                            <tr>
+                                <td>@task.Name</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+        }
+
+    </div>
 </div>

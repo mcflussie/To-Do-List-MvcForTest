@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList_Mvc.Models;
 
@@ -14,8 +15,8 @@ namespace ToDoList_Mvc.Controllers
         }
 
         public IActionResult Index()
-        {
-            return View();
+        { 
+            return View(TaskServices.model); 
         }
 
         public IActionResult Privacy()

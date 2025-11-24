@@ -7,4 +7,8 @@
     <RootNamespace>ToDoList_Mvc</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+  </ItemGroup>
+
 </Project>

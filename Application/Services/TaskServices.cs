@@ -22,5 +22,12 @@ namespace Application.Services
 
             model.Tasks.Add(newTask);
         }
+
+        public static void EditTask(Guid id, string newName)
+        {
+            var taskVieja = model.Tasks.FirstOrDefault(x => x.Id == id);
+            taskVieja.Name = newName;
+
+        }
     }
 }

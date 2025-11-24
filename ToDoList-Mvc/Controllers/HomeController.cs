@@ -31,6 +31,26 @@ namespace ToDoList_Mvc.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public IActionResult EditTask(Guid id, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Error"] = "No se debe dejar el campo vacío.";
+                return RedirectToAction("GetTaskUpdate", new { id = id });
+            }
+
+            TaskServices.EditTask(id, name);
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult GetTaskUpdate(Guid id)
+        {
+            var task = TaskServices.model.Tasks.FirstOrDefault(x => x.Id == id);
+            return View(task);
+        }
+
         public IActionResult Privacy()
         {
             return View();

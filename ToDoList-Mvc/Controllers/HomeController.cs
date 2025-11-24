@@ -19,6 +19,18 @@ namespace ToDoList_Mvc.Controllers
             return View(TaskServices.model); 
         }
 
+        public IActionResult AddTask(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                TempData["Error"] = "No se debe dejar el campo vacío.";
+                return RedirectToAction("Index");
+            }
+
+            TaskServices.AddTask(name);
+
+            return RedirectToAction("Index");
+        }
         public IActionResult Privacy()
         {
             return View();

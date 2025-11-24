@@ -29,5 +29,11 @@ namespace Application.Services
             taskVieja.Name = newName;
 
         }
+
+        public static void DeleteTask(Guid id)
+        {
+            var task = model.Tasks.FirstOrDefault(t => t.Id == id);
+            model.Tasks.Remove(task);
+        }
     }
 }

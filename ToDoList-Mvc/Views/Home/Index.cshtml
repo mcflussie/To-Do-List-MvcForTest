@@ -27,6 +27,11 @@
                             <tr>
                                 <td>@task.Name</td>
                                 <td>
+                                    <form asp-action="DeleteTask" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@task.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                    </form>
+
                                     <form asp-action="GetTaskUpdate" method="get" style="display:inline;">
                                         <input type="hidden" name="id" value="@task.Id" />
                                         <button type="submit" class="btn btn-sm btn-warning">Editar</button>

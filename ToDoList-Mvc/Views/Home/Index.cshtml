@@ -19,10 +19,25 @@
         }
         else
         {
-           
+            <div class="card-body">
+
+                <form asp-action="Index" method="get" class="mb-3">
+                    <div class="input-group">
+                        <input type="text" name="search" value="@Model.SearchTerm" class="form-control" placeholder="Buscar tarea..." />
+                        <button type="submit" class="btn btn-secondary">Buscar</button>
+                    </div>
+                </form>
+
+                @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) && Model.Filtered.Count == 0)
+                {
+                    <div class="alert alert-warning">
+                        No se encontraron tareas que coincidan con: <strong>@Model.SearchTerm</strong>
+                    </div>
+                }
+
                 <table class="table table-bordered">
                     <tbody>
-                        @foreach (var task in Model.Tasks)
+                        @foreach (var task in Model.Filtered)
                         {
                             <tr>
                                 <td>@task.Name</td>
@@ -42,6 +57,7 @@
                     </tbody>
                 </table>
 
+            </div>
         }
 
         <div class="card-footer">

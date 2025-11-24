@@ -51,6 +51,12 @@ namespace ToDoList_Mvc.Controllers
             return View(task);
         }
 
+        public IActionResult DeleteTask(Guid id)
+        {
+            TaskServices.DeleteTask(id);
+            return View("Index", TaskServices.model);
+        }
+
         public IActionResult Privacy()
         {
             return View();

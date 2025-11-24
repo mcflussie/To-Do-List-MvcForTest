@@ -33,7 +33,12 @@ namespace Application.Services
         public static void DeleteTask(Guid id)
         {
             var task = model.Tasks.FirstOrDefault(t => t.Id == id);
-            model.Tasks.Remove(task);
+
+            if (task != null)
+                model.Tasks.Remove(task);
+
+            model.Filtered = model.Tasks.ToList();
         }
+
     }
 }

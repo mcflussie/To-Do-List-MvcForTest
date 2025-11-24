@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Application.Services;
+using Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList_Mvc.Models;
 
@@ -14,9 +15,27 @@ namespace ToDoList_Mvc.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
-        { 
-            return View(TaskServices.model); 
+        public IActionResult Index(string search)
+        {
+            var all = TaskServices.model.Tasks;
+
+            List<TaskViewModel> filtered = all;
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                filtered = all
+                    .Where(t => t.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            var vm = new TasksListViewModel
+            {
+                Tasks = all,
+                Filtered = filtered,
+                SearchTerm = search
+            };
+
+            return View(vm);
         }
 
         public IActionResult AddTask(string name)

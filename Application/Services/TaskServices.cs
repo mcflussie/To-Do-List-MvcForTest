@@ -4,41 +4,61 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs;
+using Application.Entities;
+using Application.Interfaces;
 using Application.ViewModels;
 
 namespace Application.Services
 {
     public class TaskServices
     {
-        public static TasksListViewModel model = new TasksListViewModel();
+        private readonly ITaskRepository _repo;
 
-        public static void AddTask(string name)
+        public TaskServices(ITaskRepository repo)
         {
-            TaskViewModel newTask = new TaskViewModel
+            _repo = repo;
+        }
+
+        public async Task<List<TaskViewModel>> GetAllAsync(Guid userId)
+        {
+            var tasks = await _repo.GetAllByUserAsync(userId);
+            return tasks.Select(t => new TaskViewModel
+            {
+                Id = t.Id,
+                Name = t.Name
+            }).ToList();
+        }
+
+        public async Task AddTaskAsync(string name, Guid userId)
+        {
+            var task = new TaskToDo
             {
                 Id = Guid.NewGuid(),
-                Name = name
+                Name = name,
+                UserId = userId
             };
 
-            model.Tasks.Add(newTask);
+            await _repo.AddAsync(task);
+            await _repo.SaveAsync();
         }
 
-        public static void EditTask(Guid id, string newName)
+        public async Task EditTaskAsync(Guid userId, Guid taskId, string newName)
         {
-            var taskVieja = model.Tasks.FirstOrDefault(x => x.Id == id);
-            taskVieja.Name = newName;
+            var task = await _repo.GetByIdAsync(taskId, userId);
+            if (task == null) return;
 
+            task.Name = newName;
+            await _repo.UpdateAsync(task);
+            await _repo.SaveAsync();
         }
 
-        public static void DeleteTask(Guid id)
+        public async Task DeleteTaskAsync(Guid userId, Guid taskId)
         {
-            var task = model.Tasks.FirstOrDefault(t => t.Id == id);
+            var task = await _repo.GetByIdAsync(taskId, userId);
+            if (task == null) return;
 
-            if (task != null)
-                model.Tasks.Remove(task);
-
-            model.Filtered = model.Tasks.ToList();
+            await _repo.DeleteAsync(task);
+            await _repo.SaveAsync();
         }
-
     }
 }

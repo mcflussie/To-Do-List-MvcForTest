@@ -1,0 +1,25 @@
+﻿@{
+ViewData["Title"] = "Register";
+}
+
+<h2>Register</h2>
+
+<form asp-action="Register" method="post">
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" class="form-control" required />
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required />
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger mt-2">@TempData["Error"]</div>
+    }
+
+    <button type="submit" class="btn btn-success mt-2">Register</button>
+</form>
+
+<p>¿Ya tienes cuenta? <a asp-action="Login">Inicia sesión aquí</a></p>

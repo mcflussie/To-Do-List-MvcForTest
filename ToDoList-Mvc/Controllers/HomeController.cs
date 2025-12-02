@@ -6,18 +6,34 @@ using ToDoList_Mvc.Models;
 
 namespace ToDoList_Mvc.Controllers
 {
-    public class HomeController : Controller
+ public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly TaskServices _taskService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, TaskServices taskService)
         {
             _logger = logger;
+            _taskService = taskService;
         }
 
-        public IActionResult Index(string search)
+        private Guid? GetUserId()
         {
-            var all = TaskServices.model.Tasks;
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdString))
+                return null;
+
+            return Guid.Parse(userIdString);
+        }
+
+        public async Task<IActionResult> Index(string search)
+        {
+
+            var userId = GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            var all = await _taskService.GetAllAsync(userId.Value);
 
             List<TaskViewModel> filtered = all;
 
@@ -38,7 +54,8 @@ namespace ToDoList_Mvc.Controllers
             return View(vm);
         }
 
-        public IActionResult AddTask(string name)
+        [HttpPost]
+        public async Task<IActionResult> AddTask(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -46,12 +63,17 @@ namespace ToDoList_Mvc.Controllers
                 return RedirectToAction("Index");
             }
 
-            TaskServices.AddTask(name);
+            var userId = GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            await _taskService.AddTaskAsync(name, userId.Value);
 
             return RedirectToAction("Index");
         }
 
-        public IActionResult EditTask(Guid id, string name)
+        [HttpPost]
+        public async Task<IActionResult> EditTask(Guid id, string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -59,21 +81,40 @@ namespace ToDoList_Mvc.Controllers
                 return RedirectToAction("GetTaskUpdate", new { id = id });
             }
 
-            TaskServices.EditTask(id, name);
+            var userId = GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            await _taskService.EditTaskAsync(userId.Value, id, name);
 
             return RedirectToAction("Index");
         }
 
-        public IActionResult GetTaskUpdate(Guid id)
+        public async Task<IActionResult> GetTaskUpdate(Guid id)
         {
-            var task = TaskServices.model.Tasks.FirstOrDefault(x => x.Id == id);
+            var userId = GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            var task = (await _taskService.GetAllAsync(userId.Value))
+                .FirstOrDefault(x => x.Id == id);
+
+            if (task == null)
+                return RedirectToAction("Index");
+
             return View(task);
         }
 
-        public IActionResult DeleteTask(Guid id)
+        [HttpPost]
+        public async Task<IActionResult> DeleteTask(Guid id)
         {
-            TaskServices.DeleteTask(id);
-            return View("Index", TaskServices.model);
+            var userId = GetUserId();
+            if (userId == null)
+                return RedirectToAction("Login", "Account");
+
+            await _taskService.DeleteTaskAsync(userId.Value, id);
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()
@@ -84,7 +125,11 @@ namespace ToDoList_Mvc.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
+
 }
